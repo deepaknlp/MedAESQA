@@ -18,7 +18,7 @@ conda activate medaesqa
 ## Running Evaluation
 
 ```shell script
-export PYTHONPATH=$PYTHONPATH/path/to/the/medaesqa/directory
+export PYTHONPATH=$PYTHONPATH/path/to/the/medaesqa/src directory
 python medaesqa_eval.py
 ```
 
