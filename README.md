@@ -9,10 +9,6 @@ conda env create -f environment.yml
 conda activate medaesqa
 ```
 
-## Data Preparation
-1) Download the MedAESQA dataset from [OSF repository](https://doi.org/10.17605/OSF.IO/ydbzq) and place medaesqa_v1.json in `data` directory
-
-
 
 
 ## Running Evaluation
