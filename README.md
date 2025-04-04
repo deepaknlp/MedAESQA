@@ -19,7 +19,7 @@ python medaesqa_eval.py
 ```
 
 
-## Running Evaluation on BioGen 2024 top
+## Running Evaluation on BioGen 2024 topics
 Get the biogen assessment file from the TREC.
 
 ```shell script
