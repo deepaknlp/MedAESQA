@@ -4,6 +4,7 @@ from collections import defaultdict
 from tqdm.auto import tqdm
 import argparse
 import spacy
+from prettytable import PrettyTable
 
 DEFAULT_SPACY_MODEL = "en_core_web_lg"
 nlp = spacy.load(DEFAULT_SPACY_MODEL, exclude=["entity_linker", "entity_ruler", "textcat", "textcat_multilabel", "ner"])
@@ -88,7 +89,7 @@ def compute_completeness_scores(path_to_processed_annotation_file):
         })
         for run_name, totals in summary_data.items():
                 question_count = totals["question_count"]
-                assert question_count == 40
+                assert question_count == total_dataset_question_count
                 if question_count > 0:
                     avg_required = totals["required_percentage_sum"] / question_count
                     avg_unnecessary = totals["unnecessary_percentage_sum"] / question_count
@@ -128,7 +129,32 @@ def compute_completeness_scores(path_to_processed_annotation_file):
     final_summary_data = _calculate_average_classification_percentages(classification_data)
     return final_summary_data
 
+def print_results_table(*datasets):
 
+    if not datasets:
+        print("No data to display.")
+        return
+
+    merged_data = defaultdict(dict)
+
+    for data in datasets:
+        for run, details in data.items():
+            for field, value in details.items():
+                if field not in merged_data[run]:
+                    merged_data[run][field] = value
+
+    fields = ["Run Name"]
+    for run, details in merged_data.items():
+        fields.extend([field for field in details.keys() if field not in fields])
+
+    table = PrettyTable()
+    table.field_names = fields
+
+    for run, details in merged_data.items():
+        row = [run] + [details.get(field, "N/A") for field in fields[1:]]
+        table.add_row(row)
+
+    print(table)
 def compute_answer_recall(path_to_processed_annotation_file, path_to_cluster_file, cluster_type):
     def _get_cluster_id(question_wise_cluster_data, answer_sent_id):
         for cluster_id, cluster in question_wise_cluster_data.items():
@@ -138,7 +164,7 @@ def compute_answer_recall(path_to_processed_annotation_file, path_to_cluster_fil
         return -1
 
     def _calculate_question_wise_answer_recall(question_wise_cluster_list, cluster_type, cluster_size=10,
-                                               question_size=40):
+                                               question_size=total_dataset_question_count):
         summary_data = defaultdict(lambda: {
             "answer_completeness_supported_required": 0,
             "answer_completeness_required": 0,
@@ -204,6 +230,7 @@ def compute_answer_recall(path_to_processed_annotation_file, path_to_cluster_fil
                 if item["answer_sentence_relevance"] == 'required':
                     cluster_id = _get_cluster_id(cluster_data[question_id]['required_answer_sentences_cluster'],
                                                  method_name+'-'+item['answer_sentence_id'])
+
                     assert cluster_id != -1
                     question_wise_cluster_list[question_id][method_name]['required_answer_sentences_cluster'].append(
                         cluster_id)
@@ -289,7 +316,7 @@ def extract_sentences_with_pmid(text):
 
 def compute_citation_quality(path_to_processed_annotation_file):
 
-    def _calculate_question_wise_citation_quality(question_wise_citation_list, question_size=40):
+    def _calculate_question_wise_citation_quality(question_wise_citation_list, question_size=total_dataset_question_count):
         summary_data = defaultdict(lambda: {
             "citation_coverage": 0,
             "citation_sr_with_valid_generated_citations": 0,
@@ -343,7 +370,7 @@ def compute_citation_quality(path_to_processed_annotation_file):
         })
         for run_name, totals in summary_data.items():
                 question_count = totals["question_count"]
-                assert question_count == 40
+                assert question_count == total_dataset_question_count
                 avg_cc = totals["citation_coverage"] / question_size
                 avg_csr_total = totals["citation_sr_with_total_generated_citations"] / question_size
                 avg_ccr_total = totals["citation_cr_with_total_generated_citations"] / question_size
@@ -417,7 +444,7 @@ def compute_document_relevance(path_to_processed_annotation_file):
 
 
     def _calculate_question_wise_citation_quality(question_wise_citation_list, question2relevant_citation_list,
-                                                  question_size=40):
+                                                  question_size=total_dataset_question_count):
         summary_data = defaultdict(lambda: {
             "recall": 0,
             "precision_valid_citation": 0,
@@ -458,7 +485,7 @@ def compute_document_relevance(path_to_processed_annotation_file):
         })
         for run_name, totals in summary_data.items():
                 question_count = totals["question_count"]
-                assert question_count == 40
+                assert question_count == total_dataset_question_count
                 avg_recall = totals["recall"] / question_size
                 avg_prec_total = totals["precision_total_citation"] / question_size
 
@@ -499,6 +526,7 @@ def compute_document_relevance(path_to_processed_annotation_file):
                     total_citation_relevant_pmids = []
 
                     for entity in item["citation_assessment"]:
+
                         total_citation_cited_pmids.append(entity['cited_pmid'])
                         if entity['evidence_relation'] == 'supporting' or entity[
                             'evidence_relation'] == 'contradicting' or entity['evidence_relation'] == 'neutral':
@@ -522,36 +550,52 @@ def compute_document_relevance(path_to_processed_annotation_file):
 def main(path_to_processed_annotation_file, path_to_ST_cluster_file, path_to_SimCSE_cluster_file):
     result_accuracy = compute_answer_accuracy(
         path_to_processed_annotation_file=path_to_processed_annotation_file)
-    print(f"result_accuracy: {result_accuracy}")
+    print(f"result_accuracy: ")
+    print_results_table(result_accuracy)
+
     result_rates = compute_completeness_scores(
         path_to_processed_annotation_file=path_to_processed_annotation_file)
-    print(f"result_rates: {result_rates}")
+    print(f"result_rates: ")
+    print_results_table(result_rates)
     result_recall_ST = compute_answer_recall(
         path_to_processed_annotation_file=path_to_processed_annotation_file,
         path_to_cluster_file=path_to_ST_cluster_file,
         cluster_type='ST')
-    print(f"result_recall_ST: {result_recall_ST}")
+    print(f"result_recall_ST: ")
+    print_results_table(result_recall_ST)
     result_recall_SimCSE = compute_answer_recall(
         path_to_processed_annotation_file=path_to_processed_annotation_file,
         path_to_cluster_file=path_to_SimCSE_cluster_file,
         cluster_type='SimCSE')
-    print(f"result_recall_SimCSE: {result_recall_SimCSE}")
+
+    print(f"result_recall_SimCSE: ")
+    print_results_table(result_recall_SimCSE)
 
     result_citation_quality = compute_citation_quality(
         path_to_processed_annotation_file=path_to_processed_annotation_file)
-    print(f"result_citation_quality: {result_citation_quality}")
+    print(f"result_citation_quality: ")
+    print_results_table(result_citation_quality)
 
     result_document_relevance = compute_document_relevance(
         path_to_processed_annotation_file=path_to_processed_annotation_file)
-    print(f"result_document_relevance: {result_document_relevance}")
+    print(f"result_document_relevance: ")
+    print_results_table(result_document_relevance)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Process three string paths.")
-    parser.add_argument("path_to_processed_annotation_file", type=str, default='../data/medaesqa_v1.json')
-    parser.add_argument("path_to_ST_cluster_file", type=str, default='../data/question_to_clustered_answer_sentences_sentence_transformers_kmeans_transformed.json')
-    parser.add_argument("path_to_SimCSE_cluster_file", type=str, default="../data/question_to_clustered_answer_sentences_sim_cse_kmeans_transformed.json'")
+    parser.add_argument("--path_to_processed_annotation_file", type=str, default='../data/medaesqa_v1.json')
+    parser.add_argument("--path_to_ST_cluster_file", type=str, default='../data/question_to_clustered_answer_sentences_sentence_transformers_kmeans_transformed.json')
+    parser.add_argument("--path_to_SimCSE_cluster_file", type=str, default="../data/question_to_clustered_answer_sentences_sim_cse_kmeans_transformed.json'")
 
     args = parser.parse_args()
+
+    if 'biogen' in args.path_to_processed_annotation_file:
+        total_dataset_question_count=65
+    elif 'medaesqa' in args.path_to_processed_annotation_file:
+        total_dataset_question_count=40
+    else:
+        print('Dataset name should be either biogen or medaesqa.')
+        exit(-1)
 
     main(args.path_to_processed_annotation_file, args.path_to_ST_cluster_file, args.path_to_SimCSE_cluster_file)
 
