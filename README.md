@@ -22,7 +22,7 @@ python medaesqa_eval.py
 
 
 ## Running Evaluation on BioGen 2024 topics
-Obtain the Biogen assessment file and cluster files from [TREC] \(https://pages.nist.gov/trec-browser/trec33/biogen/data/).
+Obtain the Biogen assessment file and cluster files from [TREC](https://pages.nist.gov/trec-browser/trec33/biogen/data/).
 
 ```shell script
 export PYTHONPATH=$PYTHONPATH/path/to/the/medaesqa/src directory
