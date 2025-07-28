@@ -27,9 +27,9 @@ export PYTHONPATH=$PYTHONPATH/path/to/the/medaesqa/src directory
 python medaesqa_eval.py --path_to_processed_annotation_file <PATH_TO_BIOGEN_ASSESSMENT> --path_to_ST_cluster_file <PATH_TO_ST_CLUSTER_FILE> --path_to_SimCSE_cluster_file <PATH_TO_SIMCSE_CLUSTER_FILE>
 ```
 
-## Reference
+## References
 
-If you are using this code or dataset for your research work, please cite our paper:
+If you are using this code or dataset for your research work, please cite our papers:
 ```
 @article{gupta2025dataset,
   title={A Dataset of Medical Questions Paired with Automatically Generated Answers and Evidence-supported References},
