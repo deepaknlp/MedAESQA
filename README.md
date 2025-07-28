@@ -26,3 +26,18 @@ Get the biogen assessment file, cluster files from the TREC.
 export PYTHONPATH=$PYTHONPATH/path/to/the/medaesqa/src directory
 python medaesqa_eval.py --path_to_processed_annotation_file <PATH_TO_BIOGEN_ASSESSMENT> --path_to_ST_cluster_file <PATH_TO_ST_CLUSTER_FILE> --path_to_SimCSE_cluster_file <PATH_TO_SIMCSE_CLUSTER_FILE>
 ```
+
+## Reference
+
+If you are using this code or dataset for your research work, please cite our paper:
+```
+@article{gupta2025dataset,
+  title={A Dataset of Medical Questions Paired with Automatically Generated Answers and Evidence-supported References},
+  author={Gupta, Deepak and Bartels, Davis and Demner-Fushman, Dina},
+  journal={Scientific Data},
+  volume={12},
+  number={1},
+  pages={1035},
+  year={2025}
+}
+```
