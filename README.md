@@ -40,4 +40,11 @@ If you are using this code or dataset for your research work, please cite our pa
   pages={1035},
   year={2025}
 }
+
+@article{guptaoverview,
+  title={Overview of TREC 2024 Biomedical Generative Retrieval (BioGen) Track},
+  author={Gupta, Deepak and Demner-Fushman, Dina and Hersh, William and Bedrick, Steven and Roberts, Kirk},
+  journal={TREC},
+  year={2024}
+}
 ```
