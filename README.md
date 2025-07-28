@@ -8,6 +8,8 @@ Please install [Anaconda](https://www.anaconda.com/distribution/) to create a co
 conda env create -f environment.yml
 conda activate medaesqa
 ```
+## Data Preparation
+Download the MedAESQA dataset from [OSF repository](https://osf.io/ydbzq/) and place `medaesqa_v1.json` in `data` directory
 
 
 
@@ -20,7 +22,7 @@ python medaesqa_eval.py
 
 
 ## Running Evaluation on BioGen 2024 topics
-Get the biogen assessment file, cluster files from the TREC.
+Obtain the Biogen assessment file and cluster files from TREC ([https://pages.nist.gov/trec-browser/trec33/biogen/data/]).
 
 ```shell script
 export PYTHONPATH=$PYTHONPATH/path/to/the/medaesqa/src directory
